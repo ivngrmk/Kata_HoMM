@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <sstream>
 #include <string>
 #include <tuple>
 using namespace std;
@@ -17,11 +18,22 @@ public:
 		type(type_name), HitPoints(HP_value), NumberOfUnits(NumberOfUnits_value), DMG(DMG_value), LastUnit_HP(HP_value)
 	{ }
 	void BeingAttacked(const Monster& Enemies) {
-		int Total_HP = HitPoints * NumberOfUnits;
+		stringstream output;
+		output << to_string(NumberOfUnits) << " " << type << " with " << to_string(LastUnit_HP) << " of last unit HP were attacked by " << Enemies.type;
+		output << " dealing " << to_string(Enemies.DMG * Enemies.NumberOfUnits) <<  " damage." <<'\n';
+		cout << output.str();
+		int Total_HP = HitPoints * (NumberOfUnits - 1) + LastUnit_HP;
 		Total_HP -= Enemies.NumberOfUnits * Enemies.DMG;
-		if (Total_HP % HitPoints != 0) {
-			NumberOfUnits = Total_HP / HitPoints + 1;
-
+		if (Total_HP >= 0) {
+			NumberOfUnits = Total_HP / HitPoints;
+			LastUnit_HP = Total_HP % HitPoints;
+			if (LastUnit_HP != 0) {
+				++NumberOfUnits;
+			} else LastUnit_HP = HitPoints;
+		}
+		else {
+			NumberOfUnits = 0;
+			LastUnit_HP = 0;
 		}
 	}
 	bool IsDead(){
@@ -31,7 +43,9 @@ public:
 		else return false;
 	}
 	string VictoryLog(){
-		return "";
+		stringstream output;
+		output << to_string(NumberOfUnits) << " " << type << "(s) won";
+		return output.str();
 	}
 };
 typedef tuple<string, int, int, int> MonsterGroup;
@@ -41,7 +55,7 @@ string who_would_win(const MonsterGroup& mon1,const MonsterGroup& mon2) {
 	int step = 0;
 	bool battle_end = false;
 	while (!battle_end) {
-		switch (step / 2) {
+		switch (step % 2) {
 		case(0):
 			monster2.BeingAttacked(monster1);
 			if (monster2.IsDead()) {
@@ -57,9 +71,12 @@ string who_would_win(const MonsterGroup& mon1,const MonsterGroup& mon2) {
 			}
 			break;
 		}
+		step++;
 	}
 }
 int main()
 {
-	
+	MonsterGroup mon1{ "Titan", 300, 1, 50};
+	MonsterGroup mon2{ "Battle Dwarf", 20, 25, 4};
+	cout << who_would_win(mon1, mon2);
 }
