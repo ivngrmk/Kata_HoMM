@@ -31,7 +31,7 @@ public:
 		else return false;
 	}
 	string VictoryLog(){
-
+		return "";
 	}
 };
 typedef tuple<string, int, int, int> MonsterGroup;
