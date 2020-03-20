@@ -16,8 +16,13 @@ public:
 	Monster(string type_name, int HP_value, int NumberOfUnits_value, int DMG_value) :
 		type(type_name), HitPoints(HP_value), NumberOfUnits(NumberOfUnits_value), DMG(DMG_value), LastUnit_HP(HP_value)
 	{ }
-	void BeingAttacked(const Monster& Enemies)const {
+	void BeingAttacked(const Monster& Enemies) {
+		int Total_HP = HitPoints * NumberOfUnits;
+		Total_HP -= Enemies.NumberOfUnits * Enemies.DMG;
+		if (Total_HP % HitPoints != 0) {
+			NumberOfUnits = Total_HP / HitPoints + 1;
 
+		}
 	}
 	bool IsDead(){
 		if (NumberOfUnits == 0) {
